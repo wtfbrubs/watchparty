@@ -9,13 +9,14 @@ import {
 } from "../../utils/utils";
 import { examples } from "../../utils/examples";
 import ChatVideoCard from "../ChatVideoCard/ChatVideoCard";
-import { IconLink, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import {
   ActionIcon,
   Autocomplete,
   Loader,
   type AutocompleteProps,
 } from "@mantine/core";
+import styles from "./ComboBox.module.css";
 
 type ComboBoxProps = {
   roomSetMedia: (value: string) => void;
@@ -24,6 +25,7 @@ type ComboBoxProps = {
   getMediaDisplayName: (input: string) => string;
   mediaPath: string | undefined;
   disabled?: boolean;
+  roomName?: string;
 };
 
 type ComboBoxState = {
@@ -112,65 +114,90 @@ export class ComboBox extends React.Component<ComboBoxProps, ComboBoxState> {
       );
     };
     return (
-      <Autocomplete
-        maxDropdownHeight={400}
-        style={{ width: "100%" }}
-        disabled={this.props.disabled}
-        onChange={this.onChange}
-        onFocus={(e: any) => {
-          this.setState(
-            {
-              // Display the real string value (currentMedia) when focused
-              inputMedia:
-                isHttp(currentMedia) || isMagnet(currentMedia)
-                  ? currentMedia
-                  : getMediaDisplayName(currentMedia),
-            },
-            () => {
-              if (
-                !this.state.inputMedia ||
-                (this.state.inputMedia &&
-                  (isHttp(this.state.inputMedia) ||
-                    isMagnet(this.state.inputMedia)))
-              ) {
-                this.doSearch();
-              }
-              e.target.select();
-            },
-          );
-        }}
-        onBlur={() => {
-          this.setState({
-            inputMedia: undefined,
-            items: [],
-          });
-        }}
-        onKeyDown={(e: any) => {
-          if (e.key === "Enter") {
-            this.setMediaAndClose(this.state.inputMedia ?? "");
-            e.target.blur();
+      <div className={styles.terminalWrapper}>
+        <div className={styles.terminalBar}>
+          <div className={styles.terminalDots}>
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+          </div>
+          <span className={styles.terminalTitle}>
+            nativos@watchparty:~/<em>{this.props.roomName || "sala"}</em>
+          </span>
+        </div>
+        <Autocomplete
+          maxDropdownHeight={400}
+          disabled={this.props.disabled}
+          onChange={this.onChange}
+          onFocus={(e: any) => {
+            this.setState(
+              {
+                inputMedia:
+                  isHttp(currentMedia) || isMagnet(currentMedia)
+                    ? currentMedia
+                    : getMediaDisplayName(currentMedia),
+              },
+              () => {
+                if (
+                  !this.state.inputMedia ||
+                  (this.state.inputMedia &&
+                    (isHttp(this.state.inputMedia) ||
+                      isMagnet(this.state.inputMedia)))
+                ) {
+                  this.doSearch();
+                }
+                e.target.select();
+              },
+            );
+          }}
+          onBlur={() => {
+            this.setState({
+              inputMedia: undefined,
+              items: [],
+            });
+          }}
+          onKeyDown={(e: any) => {
+            if (e.key === "Enter") {
+              this.setMediaAndClose(this.state.inputMedia ?? "");
+              e.target.blur();
+            }
+          }}
+          rightSection={
+            this.props.roomMedia ? (
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={(e: any) => this.setMediaAndClose("")}
+                title="Limpar"
+              >
+                <IconX size={14} />
+              </ActionIcon>
+            ) : null
           }
-        }}
-        rightSection={
-          <ActionIcon
-            color="red"
-            onClick={(e: any) => this.setMediaAndClose("")}
-            title="Clear"
-          >
-            <IconX />
-          </ActionIcon>
-        }
-        leftSection={this.state.loading ? <Loader size="sm" /> : <IconLink />}
-        placeholder="Enter video file URL, magnet link, YouTube link, or YouTube search term"
-        value={
-          this.state.inputMedia !== undefined
-            ? this.state.inputMedia
-            : getMediaDisplayName(currentMedia)
-        }
-        renderOption={renderOption}
-        data={this.state.items.map((item) => item.url)}
-        filter={({ options }) => options}
-      />
+          leftSection={
+            this.state.loading ? (
+              <Loader size="xs" />
+            ) : (
+              <span className={styles.prompt}>$</span>
+            )
+          }
+          classNames={{
+            input: styles.input,
+            section: styles.section,
+            dropdown: styles.dropdown,
+            option: styles.option,
+          }}
+          placeholder="URL, YouTube, magnet link..."
+          value={
+            this.state.inputMedia !== undefined
+              ? this.state.inputMedia
+              : getMediaDisplayName(currentMedia)
+          }
+          renderOption={renderOption}
+          data={this.state.items.map((item) => item.url)}
+          filter={({ options }) => options}
+        />
+      </div>
     );
   }
 }

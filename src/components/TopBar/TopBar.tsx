@@ -1,25 +1,16 @@
 import React, { useCallback, useContext } from "react";
-import { serverPath, getUserImage, softWhite } from "../../utils/utils";
+import { serverPath, getUserImage } from "../../utils/utils";
 import { ActionIcon, Avatar, Button, Menu, Text } from "@mantine/core";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { LoginModal } from "../Modal/LoginModal";
 import { SubscribeButton } from "../SubscribeButton/SubscribeButton";
 import { ProfileModal } from "../Modal/ProfileModal";
-import Announce from "../Announce/Announce";
-import { InviteButton } from "../InviteButton/InviteButton";
-import appStyles from "../App/App.module.css";
 import { MetadataContext } from "../../MetadataContext";
-import config from "../../config";
 import {
-  IconBrandDiscord,
-  IconBrandFacebookFilled,
-  IconBrandGithub,
-  IconBrandGoogleFilled,
   IconCirclePlusFilled,
   IconDatabase,
   IconLogin,
-  IconMailFilled,
   IconTrash,
 } from "@tabler/icons-react";
 import styles from "./TopBar.module.css";
@@ -61,11 +52,12 @@ export const NewRoomButton = (props: {
   }, [context.user, props.openNewTab]);
   return (
     <Button
-      size={props.size}
+      variant="unstyled"
+      className={styles.navCta}
       onClick={onClick}
-      leftSection={<IconCirclePlusFilled />}
+      leftSection={<IconCirclePlusFilled size={13} />}
     >
-      New Room
+      Nova sala
     </Button>
   );
 };
@@ -86,17 +78,11 @@ export class SignInButton extends React.Component<SignInButtonProps> {
   render() {
     if (this.context.user) {
       return (
-        <div
-          style={{
-            margin: "4px",
-            minWidth: "40px",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
+        <>
           <Avatar
             src={this.state.userImage}
+            size="sm"
+            style={{ cursor: "pointer" }}
             onClick={() => this.setState({ isProfileOpen: true })}
           />
           {this.state.isProfileOpen && this.context.user && (
@@ -105,23 +91,25 @@ export class SignInButton extends React.Component<SignInButtonProps> {
               close={() => this.setState({ isProfileOpen: false })}
             />
           )}
-        </div>
+        </>
       );
     }
     return (
-      <React.Fragment>
+      <>
         {this.state.isLoginOpen && (
           <LoginModal
             closeModal={() => this.setState({ isLoginOpen: false })}
           />
         )}
         <Button
-          leftSection={<IconLogin />}
+          variant="unstyled"
+          className={styles.ghostBtn}
+          leftSection={<IconLogin size={13} />}
           onClick={() => this.setState({ isLoginOpen: true })}
         >
-          Sign in
+          Entrar
         </Button>
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -165,16 +153,17 @@ export class ListRoomsButton extends React.Component<{}> {
       <Menu>
         <Menu.Target>
           <Button
-            color="grey"
+            variant="unstyled"
+            className={styles.ghostBtn}
             onClick={this.refreshRooms}
-            leftSection={<IconDatabase />}
+            leftSection={<IconDatabase size={13} />}
           >
-            My rooms
+            Minhas salas
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
           {this.state.rooms.length === 0 && (
-            <Menu.Item disabled>You have no permanent rooms.</Menu.Item>
+            <Menu.Item disabled>Nenhuma sala permanente.</Menu.Item>
           )}
           {this.state.rooms.map((room: any) => {
             return (
@@ -187,12 +176,12 @@ export class ListRoomsButton extends React.Component<{}> {
               >
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div>
-                    <Text>
+                    <Text size="sm" ff="monospace">
                       {room.vanity
                         ? `/r/${room.vanity}`
                         : `/watch${room.roomId}`}
                     </Text>
-                    <Text size="xs" c="grey">
+                    <Text size="xs" c="dimmed" ff="monospace">
                       {room.roomId}
                     </Text>
                   </div>
@@ -205,8 +194,9 @@ export class ListRoomsButton extends React.Component<{}> {
                         this.deleteRoom(room.roomId);
                       }}
                       color="red"
+                      variant="subtle"
                     >
-                      <IconTrash size={16} />
+                      <IconTrash size={14} />
                     </ActionIcon>
                   </div>
                 </div>
@@ -228,159 +218,34 @@ export const TopBar = (props: {
   roomTitleColor?: string;
 }) => {
   const context = useContext(MetadataContext);
-  const subscribeButton = <SubscribeButton />;
   return (
     <React.Fragment>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          padding: "4px 8px",
-          rowGap: "8px",
-        }}
-      >
-        <a href="/" style={{ display: "flex" }}>
-          <img style={{ width: "56px", height: "56px" }} src="/logo192.png" />
-          {/* <div
-              style={{
-                height: '48px',
-                width: '48px',
-                marginRight: '10px',
-                borderRadius: '50%',
-                position: 'relative',
-                backgroundColor: '#' + colorMappings.blue,
-              }}
-            >
-              <Icon
-                inverted
-                name="film"
-                size="large"
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  width: '100%',
-                  margin: '0 auto',
-                }}
-              />
-              <Icon
-                inverted
-                name="group"
-                size="large"
-                color="green"
-                style={{
-                  position: 'absolute',
-                  bottom: 8,
-                  width: '100%',
-                  margin: '0 auto',
-                }}
-              />
-            </div> */}
+      <div className={styles.topBar}>
+        <a href="/" className={styles.logo}>
+          <span className={styles.prompt}>&gt;_</span>
+          nativos<span className={styles.logoDotCloud}>.cloud</span>
         </a>
+
         {props.roomTitle || props.roomDescription ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              marginRight: 10,
-              marginLeft: 10,
-            }}
-          >
+          <div className={styles.roomInfo}>
             <div
-              style={{
-                fontSize: "30px",
-                lineHeight: "30px",
-                color: props.roomTitleColor || softWhite,
-                fontWeight: 700,
-                letterSpacing: 1,
-              }}
+              className={styles.roomTitle}
+              style={{ color: props.roomTitleColor || "var(--nc-text-primary)" }}
             >
-              {props.roomTitle?.toUpperCase()}
+              {props.roomTitle}
             </div>
-            <Text size="sm" style={{}}>
-              {props.roomDescription}
-            </Text>
-          </div>
-        ) : (
-          <React.Fragment>
-            <a href="/" style={{ display: "flex", textDecoration: "none" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <div
-                  style={{
-                    textTransform: "uppercase",
-                    fontWeight: 700,
-                    color: "#2185d0",
-                    fontSize: "30px",
-                    lineHeight: "30px",
-                  }}
-                >
-                  Watch
-                </div>
-                <div
-                  style={{
-                    textTransform: "uppercase",
-                    fontWeight: 700,
-                    color: "#21ba45",
-                    fontSize: "30px",
-                    lineHeight: "30px",
-                    marginLeft: "auto",
-                  }}
-                >
-                  Party
-                </div>
+            {props.roomDescription && (
+              <div className={styles.roomDescription}>
+                {props.roomDescription}
               </div>
-            </a>
-          </React.Fragment>
-        )}
-        <Announce />
-        <div
-          className={appStyles.mobileStack}
-          style={{
-            display: "flex",
-            marginLeft: "auto",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "4px",
-            }}
-          >
-            <ActionIcon
-              component="a"
-              color="gray"
-              size="lg"
-              href="https://discord.gg/3rYj5HV"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Discord"
-            >
-              <IconBrandDiscord />
-            </ActionIcon>
-            <ActionIcon
-              component="a"
-              color="gray"
-              size="lg"
-              href="https://github.com/howardchung/watchparty"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="GitHub"
-            >
-              <IconBrandGithub />
-            </ActionIcon>
+            )}
           </div>
+        ) : null}
+
+        <div className={styles.actions}>
           {!props.hideNewRoom && <NewRoomButton openNewTab />}
           {!props.hideMyRooms && context.user && <ListRoomsButton />}
-          {subscribeButton}
+          <SubscribeButton />
           {!props.hideSignin && <SignInButton />}
         </div>
       </div>

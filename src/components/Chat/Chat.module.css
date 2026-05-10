@@ -1,106 +1,155 @@
-.subscriber {
-  color: rgb(33, 186, 69);
+/* ── Terminal panel ───────────────────────────────────── */
+
+.chatPanel {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
 }
 
-/* .subscriber {
-  position: relative;
-} */
+.chatPanelHidden {
+  display: none !important;
+}
 
-/* .subscriber img {
-  border: 3px solid transparent;
-} */
+.chatHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--nc-bg-tertiary);
+  border: 1px solid var(--nc-border);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  color: var(--nc-text-muted);
+  user-select: none;
+  flex-shrink: 0;
+}
 
-/* .subscriber:before {
-  content: '';
-  background: linear-gradient(
-    60deg,
-    #f79533,
-    #f37055,
-    #ef4e7b,
-    #a166ab,
-    #5073b8,
-    #1098ad,
-    #07b39b,
-    #6fba82
-  );
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  border-radius: 2px;
-  animation: animatedgradient 2.5s ease infinite;
-  background-size: 200% 200%;
-} */
+.chatHeaderDots {
+  display: flex;
+  gap: 4px;
+  margin-right: 4px;
+}
 
-/* @keyframes animatedgradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-} */
+.chatHeaderDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nc-border);
+}
+
+.chatHeaderTitle {
+  letter-spacing: 0.03em;
+}
+
+/* ── Container ───────────────────────────────────────── */
 
 .chatContainer {
   flex-grow: 1;
   overflow: auto;
-}
-
-.hoverEffect:hover {
-  filter: brightness(0.8);
-}
-
-.light {
-  color: gainsboro;
-  font-size: 14px;
-}
-
-.light.emoji {
-  font-size: 24px;
-}
-
-.dark {
-  color: gray;
-}
-
-.small {
+  font-family: "IBM Plex Mono", monospace;
   font-size: 12px;
+  border: 1px solid var(--nc-border);
+  border-top: none;
+  border-bottom: none;
+  padding: 6px 8px;
 }
 
-.system {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* ── Footer (reply + input) ───────────────────────────── */
+
+.chatFooter {
+  border: 1px solid var(--nc-border);
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  padding: 6px 8px 8px;
+  background: var(--nc-bg-card);
 }
 
-.comment .commentMenu {
-  display: none;
-  justify-content: center;
-  position: absolute;
-  right: 5px;
-  top: -13px;
-  padding: 4px !important;
+.chatTextInput {
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 0.82rem !important;
+  background-color: var(--nc-bg-secondary) !important;
+  border-color: var(--nc-border) !important;
+  border-radius: 3px !important;
+  color: var(--nc-text-primary) !important;
+  transition: border-color 0.15s !important;
+}
+
+.chatTextInput:focus {
+  border-color: var(--nc-green) !important;
+}
+
+.chatTextInput::placeholder {
+  color: var(--nc-text-muted) !important;
+  font-style: italic;
+}
+
+.chatTextInput:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.chatInputPrompt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--nc-green);
+  user-select: none;
+  line-height: 1;
+}
+
+/* ── Jump to bottom ───────────────────────────────────── */
+
+.jumpToBottom {
+  position: sticky;
+  bottom: 4px;
+  display: block;
+  margin: 4px auto 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  padding: 2px 12px;
+  border: 1px solid var(--nc-border);
   border-radius: 3px;
+  background: var(--nc-bg-card);
+  color: var(--nc-text-muted);
   cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-.comment .commentMenu:hover,
-.comment.selected .commentMenu {
-  background: rgb(46, 137, 212);
-  transition: background 0.2s ease-in-out;
+.jumpToBottom:hover {
+  border-color: var(--nc-green);
+  color: var(--nc-green);
+}
+
+/* ── Message line ─────────────────────────────────────── */
+
+.comment {
+  position: relative;
+  padding: 2px 4px;
+  border-radius: 2px;
+  line-height: 1.5;
+  transition: background var(--nc-transition);
 }
 
 .comment:hover,
 .comment.selected {
-  border-radius: 5px;
-  background: radial-gradient(
-    at top right,
-    #7eaee02a,
-    transparent 70%
-  ) !important;
+  background: var(--nc-bg-tertiary) !important;
+}
+
+.comment .commentMenu {
+  display: none;
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: var(--nc-bg-card);
+  border: 1px solid var(--nc-border);
 }
 
 .comment:hover .commentMenu,
@@ -108,144 +157,250 @@
   display: flex;
 }
 
+/* ── Terminal line layout ─────────────────────────────── */
+
+.terminalLine {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.linePrefix {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.timestamp {
+  color: var(--nc-text-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--nc-transition);
+}
+
+.username:hover {
+  opacity: 0.75;
+}
+
+.subscriber {
+  text-decoration: underline;
+  text-decoration-color: var(--nc-green);
+  text-underline-offset: 2px;
+}
+
+.promptArrow {
+  color: var(--nc-green);
+  font-size: 11px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.messageText {
+  color: var(--nc-text-primary);
+  font-size: 12px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ── System messages ──────────────────────────────────── */
+
+.systemLine {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 1px 0;
+  opacity: 0.7;
+}
+
+.systemPrefix {
+  color: var(--nc-text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.systemUser {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.systemAction {
+  color: var(--nc-text-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* ── Reply ────────────────────────────────────────────── */
+
 .replyMessage {
-  background: radial-gradient(
-    at top right,
-    rgba(255, 176, 96, 0.22),
-    transparent 70%
-  );
+  border-left: 2px solid var(--nc-yellow);
+  background: rgba(255, 234, 104, 0.04) !important;
 }
 
 .replyInfo {
-  color: rgba(180, 200, 220, 0.95);
-  font-size: 12px;
-  margin-bottom: 2px;
+  color: var(--nc-text-muted);
+  font-size: 10px;
+  margin-bottom: 1px;
+  padding-left: 2px;
+}
+
+.replyInfo::before {
+  content: "╰ ";
+  color: var(--nc-green);
 }
 
 .replyTooltip {
-  background: rgba(20, 28, 36, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(240, 248, 255, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--nc-bg-card);
+  border: 1px solid var(--nc-border);
+  color: var(--nc-text-primary);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
   max-width: 360px;
   padding: 6px 8px;
-  font-size: 12px;
-  line-height: 1.2;
+  line-height: 1.4;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   pointer-events: none;
 }
 
-.reactionMenuContainer {
-  display: flex;
-  flex-wrap: nowrap;
-  border-radius: 5px;
-  position: fixed;
-  font-size: 24px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.91);
-}
-
-.reactionMenuContainer div {
-  line-height: 30px;
-  padding: 5px;
-}
-
-.reactionMenuContainer div:hover {
-  background-color: rgb(46, 137, 212);
-  transition: background-color 0.2s ease-in-out;
-}
+/* ── Reactions ────────────────────────────────────────── */
 
 .reactionContainer {
   display: inline-flex;
   align-items: center;
-  padding: 3px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.16);
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: var(--nc-bg-tertiary);
+  border: 1px solid var(--nc-border);
   margin-right: 3px;
-  margin-top: 1px;
-  min-width: 39px;
+  margin-top: 2px;
+  min-width: 32px;
   cursor: pointer;
+  font-size: 13px;
+  transition: border-color var(--nc-transition), background var(--nc-transition);
 }
 
 .reactionContainer.highlighted {
-  background: rgb(66, 111, 129);
+  background: var(--nc-green-subtle);
+  border-color: var(--nc-green);
 }
 
 .reactionContainer:hover {
-  background-color: rgb(46, 137, 212);
-  transition: background-color 0.2s ease-in-out;
+  background: var(--nc-green-subtle);
+  border-color: var(--nc-green);
 }
 
-.reaction-enter {
-  transform: scale(0);
-}
-.reaction-enter-active {
-  transform: scale(1);
-  transition: all 200ms ease-in !important;
-}
-.reaction-exit {
-  transform: scale(1);
-}
-.reaction-exit-active {
-  transform: scale(0);
-  transition: all 200ms ease-in !important;
+.reactionMenuContainer {
+  display: flex;
+  flex-wrap: nowrap;
+  border-radius: 2px;
+  position: fixed;
+  font-size: 22px;
+  overflow: hidden;
+  background: var(--nc-bg-card);
+  border: 1px solid var(--nc-border);
 }
 
-.reactionCounter-enter {
-  transform: scale(0);
-  color: rgb(255, 136, 0) !important;
-}
-.reactionCounter-enter-active {
-  transform: scale(1);
-  transition: all 200ms ease-in !important;
-}
-.reactionCounter-exit {
-  transform: scale(1);
-  color: rgb(255, 136, 0) !important;
-}
-.reactionCounter-exit-active {
-  transform: scale(0);
-  transition: all 200ms ease-in !important;
+.reactionMenuContainer div {
+  line-height: 28px;
+  padding: 4px;
 }
 
-.reactionMenu-enter {
-  transform: scale(0);
+.reactionMenuContainer div:hover {
+  background: var(--nc-green-subtle);
+  transition: background var(--nc-transition);
 }
-.reactionMenu-enter-active {
-  transform: scale(1);
-  transition: all 100ms ease-out !important;
+
+/* ── Reply composer ───────────────────────────────────── */
+
+.replyComposer {
+  animation: replyComposerIn 180ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-left: 2px solid var(--nc-green);
+  background: var(--nc-bg-tertiary);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  margin-bottom: 6px;
 }
-.reactionMenu-exit {
-  transform: scale(1);
+
+.replyComposerText {
+  color: var(--nc-text-muted);
 }
-.reactionMenu-exit-active {
-  transform: scale(0);
-  transition: all 100ms ease-out !important;
+
+.replyComposerUser {
+  color: var(--nc-text-secondary);
+}
+
+.replyComposerPreview {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+  color: var(--nc-text-muted);
+}
+
+.replyComposerArrow {
+  color: var(--nc-green);
+}
+
+.replyClearBtn {
+  background: none;
+  border: none;
+  color: var(--nc-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.replyClearBtn:hover {
+  color: var(--nc-text-primary);
 }
 
 @keyframes replyComposerIn {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(-2px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.replyComposer {
-  animation: replyComposerIn 220ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .replyComposer {
-    animation: none;
-  }
+  .replyComposer { animation: none; }
 }
+
+/* ── Reaction transitions ─────────────────────────────── */
+
+.reaction-enter         { transform: scale(0); }
+.reaction-enter-active  { transform: scale(1); transition: all 200ms ease-in !important; }
+.reaction-exit          { transform: scale(1); }
+.reaction-exit-active   { transform: scale(0); transition: all 200ms ease-in !important; }
+
+.reactionCounter-enter         { transform: scale(0); color: var(--nc-yellow) !important; }
+.reactionCounter-enter-active  { transform: scale(1); transition: all 200ms ease-in !important; }
+.reactionCounter-exit          { transform: scale(1); color: var(--nc-yellow) !important; }
+.reactionCounter-exit-active   { transform: scale(0); transition: all 200ms ease-in !important; }
+
+.reactionMenu-enter        { transform: scale(0); }
+.reactionMenu-enter-active { transform: scale(1); transition: all 100ms ease-out !important; }
+.reactionMenu-exit         { transform: scale(1); }
+.reactionMenu-exit-active  { transform: scale(0); transition: all 100ms ease-out !important; }
+
+/* ── Misc ─────────────────────────────────────────────── */
+
+.hoverEffect:hover { opacity: 0.75; }
+.small { font-size: 10px; }

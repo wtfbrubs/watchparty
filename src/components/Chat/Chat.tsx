@@ -1,8 +1,6 @@
 import React, { RefObject, useContext } from "react";
 import {
   ActionIcon,
-  Avatar,
-  Button,
   HoverCard,
   TextInput,
 } from "@mantine/core";
@@ -239,24 +237,20 @@ export class Chat extends React.Component<ChatProps> {
   render() {
     return (
       <div
-        className={this.props.className}
-        style={{
-          display: this.props.hide ? "none" : "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          minHeight: 0,
-          marginTop: 0,
-          marginBottom: 0,
-          padding: "8px",
-          backgroundColor: "rgba(30,30,30,1)",
-        }}
+        className={`${styles.chatPanel} ${this.props.hide ? styles.chatPanelHidden : ""} ${this.props.className || ""}`}
       >
-        <div
-          className={styles.chatContainer}
-          ref={this.messagesRef}
-          style={{ position: "relative" }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div className={styles.chatHeader}>
+          <div className={styles.chatHeaderDots}>
+            <span className={styles.chatHeaderDot} />
+            <span className={styles.chatHeaderDot} />
+            <span className={styles.chatHeaderDot} />
+          </div>
+          <span className={styles.chatHeaderTitle}>
+            nativos@watchparty:~/chat
+          </span>
+        </div>
+        <div className={styles.chatContainer} ref={this.messagesRef}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
             {this.props.chat.map((msg) => (
               <ChatMessage
                 key={msg.timestamp + msg.id}
@@ -278,21 +272,11 @@ export class Chat extends React.Component<ChatProps> {
                 onReply={this.setReplyTo}
               />
             ))}
-            {/* <div ref={this.messagesEndRef} /> */}
           </div>
           {!this.state.isNearBottom && (
-            <Button
-              size="xs"
-              onClick={this.scrollToBottom}
-              style={{
-                position: "sticky",
-                bottom: 0,
-                display: "block",
-                margin: "0 auto",
-              }}
-            >
-              Jump to bottom
-            </Button>
+            <button className={styles.jumpToBottom} onClick={this.scrollToBottom}>
+              ↓ ir para o final
+            </button>
           )}
         </div>
         {this.state.isPickerOpen && (
@@ -346,70 +330,55 @@ export class Chat extends React.Component<ChatProps> {
             xPosition={this.state.reactionMenu.xPosition}
           /> */}
         </CSSTransition>
-        {this.state.replyTo && (
-          <div
-            className={styles.replyComposer}
-            style={{
-              marginTop: 10,
-              padding: "6px 8px",
-              borderLeft: "2px solid rgb(46, 137, 212)",
-              background: "rgba(255, 255, 255, 0.06)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <div className={styles.small + " " + styles.light}>
-              Replying to {this.props.nameMap[this.state.replyTo.id] || "Unknown"}
-              {this.state.replyTo.msg ? (
-                <div
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: 260,
-                  }}
-                >
-                  {this.state.replyTo.msg}
-                </div>
-              ) : null}
+        <div className={styles.chatFooter}>
+          {this.state.replyTo && (
+            <div className={styles.replyComposer}>
+              <div className={styles.replyComposerText}>
+                <span className={styles.replyComposerArrow}>╰ </span>
+                respondendo a{" "}
+                <span className={styles.replyComposerUser}>
+                  @{this.props.nameMap[this.state.replyTo.id] || "Unknown"}
+                </span>
+                {this.state.replyTo.msg && (
+                  <span className={styles.replyComposerPreview}>
+                    {this.state.replyTo.msg}
+                  </span>
+                )}
+              </div>
+              <button className={styles.replyClearBtn} onClick={this.clearReplyTo}>
+                ✕
+              </button>
             </div>
-            <Button size="xs" variant="subtle" onClick={this.clearReplyTo}>
-              Cancel
-            </Button>
-          </div>
-        )}
-        <TextInput
-          ref={this.chatInputRef}
-          style={{ marginTop: "10px" }}
-          onKeyDown={(e: any) => e.key === "Enter" && this.sendChatMsg()}
-          onChange={this.updateChatMsg}
-          value={this.state.chatMsg}
-          error={this.chatTooLong()}
-          disabled={this.props.isChatDisabled}
-          placeholder={
-            this.props.isChatDisabled
-              ? "The chat was disabled by the room owner."
-              : "Enter a message..."
-          }
-          rightSection={
-            <ActionIcon
-              onClick={() => {
-                // Add a delay to prevent the click from triggering onClickOutside
-                const curr = this.state.isPickerOpen;
-                setTimeout(() => this.setState({ isPickerOpen: !curr }), 100);
-              }}
-              disabled={this.props.isChatDisabled}
-            >
-              <span role="img" aria-label="Emoji">
-                😀
-              </span>
-            </ActionIcon>
-          }
-        >
-          {/* <Icon onClick={this.sendChatMsg} name="send" inverted circular link /> */}
-        </TextInput>
+          )}
+          <TextInput
+            ref={this.chatInputRef}
+            onKeyDown={(e: any) => e.key === "Enter" && this.sendChatMsg()}
+            onChange={this.updateChatMsg}
+            value={this.state.chatMsg}
+            error={this.chatTooLong()}
+            disabled={this.props.isChatDisabled}
+            placeholder={
+              this.props.isChatDisabled
+                ? "chat desabilitado pelo dono da sala"
+                : "mensagem..."
+            }
+            classNames={{ input: styles.chatTextInput }}
+            leftSection={<span className={styles.chatInputPrompt}>›</span>}
+            rightSection={
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={() => {
+                  const curr = this.state.isPickerOpen;
+                  setTimeout(() => this.setState({ isPickerOpen: !curr }), 100);
+                }}
+                disabled={this.props.isChatDisabled}
+              >
+                <span role="img" aria-label="Emoji">😀</span>
+              </ActionIcon>
+            }
+          />
+        </div>
       </div>
     );
   }
@@ -449,237 +418,222 @@ const ChatMessage = ({
   const { user } = useContext(MetadataContext);
   const { id, timestamp, cmd, msg, system, isSub, reactions, videoTS } =
     message;
-  const spellFull = 5; // the number of people whose names should be written out in full in the reaction popup
+  const spellFull = 5;
   const imageMsg = renderImageString(msg);
+  const timeStr = new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const displayName = Boolean(system) ? "system" : nameMap[id] || id;
+  const userColor = "#" + getColorForStringHex(id);
+
   return (
     <div
-      style={{
-        display: "flex",
-        gap: "8px",
-        alignItems: "center",
-        position: "relative",
-        overflowWrap: "anywhere",
-      }}
       className={`${styles.comment} ${className} ${
         message.replyToUserId === clientId ? styles.replyMessage : ""
       }`}
     >
-      {id ? (
-        <Avatar
-          src={
-            pictureMap[id] ||
-            getDefaultPicture(nameMap[id], getColorForStringHex(id))
-          }
-        />
-      ) : null}
-      <div>
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            alignItems: "flex-end",
-            fontSize: 14,
+      {cmd ? (
+        /* ── System / command line ── */
+        <div className={styles.systemLine}>
+          <div className={styles.linePrefix}>
+            <span className={styles.timestamp}>[{timeStr}]</span>
+            <span className={styles.systemPrefix}>//</span>
+            <span className={styles.systemUser} style={{ color: userColor }}>
+              {displayName}
+            </span>
+          </div>
+          <span className={styles.systemAction}>
+            {formatMessage(cmd, msg)}
+            {Boolean(videoTS) && <span> @ {formatTimestamp(videoTS)}</span>}
+          </span>
+        </div>
+      ) : (
+        /* ── Chat line ── */
+        <>
+          {message.replyToUserId && (
+            <HoverCard withinPortal={false} openDelay={120}>
+              <HoverCard.Target>
+                <div className={styles.replyInfo}>
+                  @{nameMap[message.replyToUserId] || "user"}
+                  {message.replyToMsg && `: ${truncateReply(message.replyToMsg, 40)}`}
+                </div>
+              </HoverCard.Target>
+              <HoverCard.Dropdown className={styles.replyTooltip}>
+                {message.replyToMsg || ""}
+              </HoverCard.Dropdown>
+            </HoverCard>
+          )}
+          <div className={styles.terminalLine}>
+            <div className={styles.linePrefix}>
+              <span
+                className={styles.timestamp}
+                title={new Date(timestamp).toLocaleString()}
+              >
+                [{timeStr}]
+              </span>
+              <UserMenu
+                displayName={nameMap[id] || id}
+                timestamp={timestamp}
+                socket={socket}
+                userToManage={id}
+                isChatMessage
+                disabled={!Boolean(owner && owner === user?.uid)}
+                trigger={
+                  <span
+                    className={`${styles.username} ${isSub ? styles.subscriber : ""} ${styles.hoverEffect}`}
+                    style={{ color: userColor }}
+                    title={isSub ? "subscriber" : undefined}
+                  >
+                    {displayName}
+                  </span>
+                }
+              />
+              <span className={styles.promptArrow}>›</span>
+            </div>
+            <Linkify
+              componentDecorator={(
+                decoratedHref: string,
+                decoratedText: string,
+                key: string,
+              ) => (
+                <SecureLink href={decoratedHref} key={key}>
+                  {decoratedText}
+                </SecureLink>
+              )}
+            >
+              <span
+                className={`${styles.messageText} ${
+                  isEmojiString(msg) ? styles.emoji : ""
+                }`}
+              >
+                {msg}
+              </span>
+            </Linkify>
+          </div>
+          {imageMsg && (
+            <div style={{ paddingLeft: 4, marginTop: 2 }}>{imageMsg}</div>
+          )}
+        </>
+      )}
+
+      {/* Hover action menu */}
+      <div className={styles.commentMenu}>
+        {id && id !== clientId && (
+          <ActionIcon
+            size="xs"
+            variant="subtle"
+            onClick={() => onReply(id, timestamp, msg)}
+            disabled={isChatDisabled}
+            title="Reply"
+          >
+            <span style={{ fontSize: 12 }}>↩</span>
+          </ActionIcon>
+        )}
+        <ActionIcon
+          size="xs"
+          variant="subtle"
+          title="React"
+          disabled={isChatDisabled}
+          onClick={(e) => {
+            //@ts-expect-error
+            const viewportOffset = e.target.getBoundingClientRect();
+            setTimeout(() => {
+              setReactionMenu(
+                true,
+                id,
+                timestamp,
+                viewportOffset.top,
+                viewportOffset.right,
+              );
+            }, 100);
           }}
         >
-          <UserMenu
-            displayName={nameMap[id] || id}
-            timestamp={timestamp}
-            socket={socket}
-            userToManage={id}
-            isChatMessage
-            disabled={!Boolean(owner && owner === user?.uid)}
-            trigger={
-              <div
-                style={{ cursor: "pointer", fontWeight: 700 }}
-                title={isSub ? "WatchParty Plus subscriber" : ""}
-                className={`${isSub ? styles.subscriber : styles.light} ${styles.hoverEffect}`}
-              >
-                {Boolean(system) && "System"}
-                {nameMap[id] || id}
-              </div>
-            }
-          />
-          <div className={styles.small + " " + styles.dark}>
-            <div title={new Date(timestamp).toLocaleDateString()}>
-              {new Date(timestamp).toLocaleTimeString()}
-              {Boolean(videoTS) && " @ "}
-              {formatTimestamp(videoTS)}
-            </div>
-          </div>
-        </div>
-        <div className={styles.light + " " + styles.system}>
-          {cmd && formatMessage(cmd, msg)}
-        </div>
-        {message.replyToUserId && (
-          <HoverCard withinPortal={false} openDelay={120}>
-            <HoverCard.Target>
-              <div className={styles.replyInfo}>
-                {`Replying to @${nameMap[message.replyToUserId] || "user"}: `}
-                {truncateReply(message.replyToMsg, 30)}
-              </div>
-            </HoverCard.Target>
-            <HoverCard.Dropdown className={styles.replyTooltip}>
-              {message.replyToMsg || ""}
-            </HoverCard.Dropdown>
-          </HoverCard>
-        )}
-        <Linkify
-          componentDecorator={(
-            decoratedHref: string,
-            decoratedText: string,
-            key: string,
-          ) => (
-            <SecureLink href={decoratedHref} key={key}>
-              {decoratedText}
-            </SecureLink>
-          )}
-        >
-          <div
-            className={`${styles.light} ${
-              isEmojiString(msg) ? styles.emoji : ""
-            }`}
-          >
-            {!cmd && msg}
-          </div>
-        </Linkify>
-        {imageMsg}
-        <div className={styles.commentMenu}>
-          {id && id !== clientId && (
-            <ActionIcon
-              onClick={() => onReply(id, timestamp, msg)}
-              disabled={isChatDisabled}
-              style={{
-                opacity: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 0,
-                margin: 0,
-                marginRight: 4,
-              }}
-            >
-              <span role="img" aria-label="Reply" style={{ margin: 0, fontSize: 16 }}>
-                ↩
-              </span>
-            </ActionIcon>
-          )}
-          <ActionIcon
-            onClick={(e) => {
-              //@ts-expect-error
-              const viewportOffset = e.target.getBoundingClientRect();
-              setTimeout(() => {
-                setReactionMenu(
-                  true,
-                  id,
-                  timestamp,
-                  viewportOffset.top,
-                  viewportOffset.right,
-                );
-              }, 100);
-            }}
-            disabled={isChatDisabled}
-            style={{
-              opacity: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: 0,
-              margin: 0,
-            }}
-          >
-            <span
-              role="img"
-              aria-label="React"
-              style={{ margin: 0, fontSize: 18 }}
-            >
-              😀
-            </span>
-          </ActionIcon>
-        </div>
-        <TransitionGroup>
-          {Object.keys(reactions ?? []).map((key) =>
-            reactions?.[key].length ? (
-              <CSSTransition
-                key={key}
-                timeout={200}
-                classNames={{
-                  enter: styles["reaction-enter"],
-                  enterActive: styles["reaction-enter-active"],
-                  exit: styles["reaction-exit"],
-                  exitActive: styles["reaction-exit-active"],
-                }}
-                unmountOnExit
-              >
-                <HoverCard>
-                  <HoverCard.Target>
-                    <div
-                      className={`${styles.reactionContainer} ${
-                        reactions[key].includes(clientId)
-                          ? styles.highlighted
-                          : ""
-                      }`}
-                      onClick={() =>
-                        handleReactionClick(key, message.id, message.timestamp)
-                      }
-                    >
-                      <span
-                        style={{
-                          fontSize: 17,
-                          position: "relative",
-                          bottom: 1,
-                        }}
-                      >
-                        {key}
-                      </span>
-                      <SwitchTransition>
-                        <CSSTransition
-                          key={key + "-" + reactions[key].length}
-                          classNames={{
-                            enter: styles["reactionCounter-enter"],
-                            enterActive: styles["reactionCounter-enter-active"],
-                            exit: styles["reactionCounter-exit"],
-                            exitActive: styles["reactionCounter-exit-active"],
-                          }}
-                          addEndListener={(node, done) =>
-                            node.addEventListener("transitionend", done, false)
-                          }
-                          unmountOnExit
-                        >
-                          <span
-                            className={styles.reactionCounter}
-                            style={{
-                              color: "rgba(255, 255, 255, 0.85)",
-                              marginLeft: 3,
-                            }}
-                          >
-                            {reactions[key].length}
-                          </span>
-                        </CSSTransition>
-                      </SwitchTransition>
-                    </div>
-                  </HoverCard.Target>
-                  <HoverCard.Dropdown>
-                    {`${reactions[key]
-                      .slice(0, spellFull)
-                      .map((id) => nameMap[id] || "Unknown")
-                      .concat(
-                        reactions[key].length > spellFull
-                          ? [`${reactions[key].length - spellFull} more`]
-                          : [],
-                      )
-                      .reduce(
-                        (text, value, i, array) =>
-                          text +
-                          (i < array.length - 1 ? ", " : " and ") +
-                          value,
-                      )} reacted.`}
-                  </HoverCard.Dropdown>
-                </HoverCard>
-              </CSSTransition>
-            ) : null,
-          )}
-        </TransitionGroup>
+          <span style={{ fontSize: 12 }}>😀</span>
+        </ActionIcon>
       </div>
+
+      {/* Reactions */}
+      <TransitionGroup>
+        {Object.keys(reactions ?? []).map((key) =>
+          reactions?.[key].length ? (
+            <CSSTransition
+              key={key}
+              timeout={200}
+              classNames={{
+                enter: styles["reaction-enter"],
+                enterActive: styles["reaction-enter-active"],
+                exit: styles["reaction-exit"],
+                exitActive: styles["reaction-exit-active"],
+              }}
+              unmountOnExit
+            >
+              <HoverCard>
+                <HoverCard.Target>
+                  <div
+                    className={`${styles.reactionContainer} ${
+                      reactions[key].includes(clientId) ? styles.highlighted : ""
+                    }`}
+                    onClick={() =>
+                      handleReactionClick(key, message.id, message.timestamp)
+                    }
+                  >
+                    <span style={{ fontSize: 14 }}>{key}</span>
+                    <SwitchTransition>
+                      <CSSTransition
+                        key={key + "-" + reactions[key].length}
+                        classNames={{
+                          enter: styles["reactionCounter-enter"],
+                          enterActive: styles["reactionCounter-enter-active"],
+                          exit: styles["reactionCounter-exit"],
+                          exitActive: styles["reactionCounter-exit-active"],
+                        }}
+                        addEndListener={(node, done) =>
+                          node.addEventListener("transitionend", done, false)
+                        }
+                        unmountOnExit
+                      >
+                        <span
+                          style={{
+                            color: "var(--nc-text-secondary)",
+                            fontFamily: '"IBM Plex Mono", monospace',
+                            fontSize: 10,
+                            marginLeft: 3,
+                          }}
+                        >
+                          {reactions[key].length}
+                        </span>
+                      </CSSTransition>
+                    </SwitchTransition>
+                  </div>
+                </HoverCard.Target>
+                <HoverCard.Dropdown
+                  style={{
+                    fontFamily: '"IBM Plex Mono", monospace',
+                    fontSize: 11,
+                    background: "var(--nc-bg-card)",
+                    border: "1px solid var(--nc-border)",
+                    color: "var(--nc-text-secondary)",
+                  }}
+                >
+                  {`${reactions[key]
+                    .slice(0, spellFull)
+                    .map((id) => nameMap[id] || "Unknown")
+                    .concat(
+                      reactions[key].length > spellFull
+                        ? [`${reactions[key].length - spellFull} more`]
+                        : [],
+                    )
+                    .reduce(
+                      (text, value, i, array) =>
+                        text + (i < array.length - 1 ? ", " : " and ") + value,
+                    )} reacted.`}
+                </HoverCard.Dropdown>
+              </HoverCard>
+            </CSSTransition>
+          ) : null,
+        )}
+      </TransitionGroup>
     </div>
   );
 };

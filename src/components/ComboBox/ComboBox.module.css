@@ -1,0 +1,100 @@
+.terminalWrapper {
+  width: 100%;
+}
+
+.terminalBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 10px;
+  background: var(--nc-bg-tertiary);
+  border: 1px solid var(--nc-border);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  color: var(--nc-text-muted);
+  user-select: none;
+}
+
+.terminalDots {
+  display: flex;
+  gap: 4px;
+  margin-right: 4px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nc-border);
+}
+
+.terminalTitle {
+  letter-spacing: 0.03em;
+}
+
+.terminalTitle em {
+  font-style: normal;
+  color: var(--nc-green);
+}
+
+/* Input overrides via Mantine classNames */
+
+.input {
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 0.82rem !important;
+  background-color: var(--nc-bg-secondary) !important;
+  border-color: var(--nc-border) !important;
+  border-radius: 0 0 3px 3px !important;
+  color: var(--nc-text-primary) !important;
+  padding-left: 36px !important;
+  transition: border-color 0.15s !important;
+}
+
+.input:focus {
+  border-color: var(--nc-green) !important;
+}
+
+.input::placeholder {
+  color: var(--nc-text-muted) !important;
+  font-style: italic;
+}
+
+.input:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.section {
+  color: var(--nc-text-muted);
+}
+
+.prompt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--nc-green);
+  user-select: none;
+  line-height: 1;
+  padding-bottom: 1px;
+}
+
+.dropdown {
+  background: var(--nc-bg-card) !important;
+  border: 1px solid var(--nc-border) !important;
+  border-radius: 3px !important;
+  border-top: none !important;
+  font-family: "IBM Plex Mono", monospace !important;
+}
+
+.option {
+  padding: 4px 8px !important;
+  border-radius: 0 !important;
+  transition: background 0.1s !important;
+}
+
+.option:hover,
+.option[data-combobox-selected] {
+  background: var(--nc-bg-tertiary) !important;
+}

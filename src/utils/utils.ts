@@ -67,7 +67,7 @@ export const colorMappings: StringDict = {
   grey: "A0A0A0",
 };
 
-export const softWhite = "whitesmoke";
+export const softWhite = "#f2eee6";
 
 let colorCache: NumberDict = {};
 export function getColorForString(id: string) {

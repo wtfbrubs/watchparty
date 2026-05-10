@@ -327,7 +327,7 @@ export class Room {
         (await validateOwner()) && this.setRoomOwner(socket, data);
       });
       socket.on("CMD:playlistNext", (data: unknown) => {
-        validateLock() && this.playlistNext(data);
+        this.playlistNext(data);
       });
       socket.on("CMD:playlistAdd", (data: unknown) => {
         validateLock() && this.playlistAdd(socket, String(data));

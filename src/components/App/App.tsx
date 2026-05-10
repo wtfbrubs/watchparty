@@ -50,7 +50,7 @@ import styles from "./App.module.css";
 import config from "../../config";
 import { MetadataContext } from "../../MetadataContext";
 import ChatVideoCard from "../ChatVideoCard/ChatVideoCard";
-import { ActionIcon, Badge, TextInput, Button } from "@mantine/core";
+import { ActionIcon, TextInput, Button } from "@mantine/core";
 import {
   IconAntennaBars5,
   IconBrowser,
@@ -2186,48 +2186,53 @@ export class App extends React.Component<AppProps, AppState> {
                         getMediaDisplayName={this.getMediaDisplayName}
                         mediaPath={this.state.mediaPath}
                         disabled={!this.haveLock()}
+                        roomName={
+                          this.state.roomTitle ||
+                          this.state.roomId.replace(/^\//, "")
+                        }
                       />
                     </div>
                     <div className={styles.mobileStack}>
                       {this.localStreamToPublish && (
                         <Button
-                          color="red"
+                          variant="unstyled"
+                          className={`${styles.ncBtn} ${styles.ncBtnDanger}`}
                           onClick={this.stopPublishingLocalStream}
-                          leftSection={<IconX />}
+                          leftSection={<IconX size={13} />}
                         >
-                          Stop Share
+                          Parar
                         </Button>
                       )}
                       {!this.localStreamToPublish &&
                         !sharer &&
                         !this.playingVBrowser() && (
                           <Button
-                            className={styles.shareButton}
-                            color="blue"
+                            variant="unstyled"
+                            className={`${styles.ncBtn} ${styles.shareButton}`}
                             disabled={!this.haveLock()}
                             onClick={() => {
                               this.setState({
                                 isScreenShareModalOpen: true,
                               });
                             }}
-                            leftSection={<IconScreenShare />}
+                            leftSection={<IconScreenShare size={13} />}
                           >
-                            Screenshare
+                            Tela
                           </Button>
                         )}
                       {!this.localStreamToPublish &&
                         !sharer &&
                         !this.playingVBrowser() && (
                           <Button
-                            className={styles.shareButton}
+                            variant="unstyled"
+                            className={`${styles.ncBtn} ${styles.shareButton}`}
                             disabled={!this.haveLock()}
-                            color="green"
                             onClick={() => {
                               this.setState({
                                 isVBrowserModalOpen: true,
                               });
                             }}
-                            leftSection={<IconBrowser />}
+                            leftSection={<IconBrowser size={13} />}
                           >
                             VBrowser
                           </Button>
@@ -2235,12 +2240,13 @@ export class App extends React.Component<AppProps, AppState> {
                       {this.playingVBrowser() && (
                         <>
                           <Button
-                            color="red"
+                            variant="unstyled"
+                            className={`${styles.ncBtn} ${styles.ncBtnDanger}`}
                             disabled={!this.haveLock()}
                             onClick={this.stopVBrowser}
-                            leftSection={<IconX />}
+                            leftSection={<IconX size={13} />}
                           >
-                            Stop VBrowser
+                            Parar VBrowser
                           </Button>
                           <Select
                             leftSection={<IconKeyboardFilled />}
@@ -2325,28 +2331,29 @@ export class App extends React.Component<AppProps, AppState> {
                         !sharer &&
                         !this.playingVBrowser() && (
                           <Button
-                            className={styles.shareButton}
-                            color="violet"
+                            variant="unstyled"
+                            className={`${styles.ncBtn} ${styles.shareButton}`}
                             disabled={!this.haveLock()}
                             onClick={() => {
                               this.setState({
                                 isFileShareModalOpen: true,
                               });
                             }}
-                            leftSection={<IconFile />}
+                            leftSection={<IconFile size={13} />}
                           >
-                            File
+                            Arquivo
                           </Button>
                         )}
                       {this.state.uploadController && (
                         <Button
-                          color="red"
+                          variant="unstyled"
+                          className={`${styles.ncBtn} ${styles.ncBtnDanger}`}
                           onClick={() => {
                             this.state.uploadController?.abort();
                           }}
-                          leftSection={<IconX />}
+                          leftSection={<IconX size={13} />}
                         >
-                          Stop Convert
+                          Parar conversão
                         </Button>
                       )}
                       {false && (
@@ -2372,12 +2379,19 @@ export class App extends React.Component<AppProps, AppState> {
                       <Menu>
                         <Menu.Target>
                           <Button
-                            color="grey"
-                            leftSection={<IconList />}
+                            variant="unstyled"
+                            className={`${styles.ncBtn} ${styles.shareButton}`}
+                            leftSection={<IconList size={13} />}
                             rightSection={
-                              <Badge circle>{playlist.length}</Badge>
+                              <span style={{
+                                fontFamily: '"IBM Plex Mono", monospace',
+                                fontSize: "0.6rem",
+                                color: "var(--nc-text-muted)",
+                                marginLeft: 2,
+                              }}>
+                                [{playlist.length}]
+                              </span>
                             }
-                            className={styles.shareButton}
                           >
                             Playlist
                           </Button>
@@ -2606,7 +2620,6 @@ export class App extends React.Component<AppProps, AppState> {
             >
               <div style={{ display: "flex", width: "100%", gap: "4px" }}>
                 <TextInput
-                  // description="Name"
                   style={{
                     visibility: this.state.showChatColumn
                       ? undefined
@@ -2614,51 +2627,55 @@ export class App extends React.Component<AppProps, AppState> {
                     flexGrow: 1,
                   }}
                   value={this.state.myName}
-                  onChange={(e) => {
-                    this.updateName(e.target.value);
-                  }}
+                  onChange={(e) => this.updateName(e.target.value)}
                   onFocus={(e) => e.target.select()}
-                  leftSection={<IconUser />}
-                  rightSectionWidth={70}
+                  placeholder="seu nome..."
+                  classNames={{ input: styles.chatNameInput }}
+                  leftSection={
+                    <span className={styles.chatNamePrompt}>~</span>
+                  }
+                  rightSectionWidth={46}
                   rightSection={
                     <Button
-                      size="compact-xs"
+                      variant="unstyled"
+                      className={styles.chatRandomBtn}
                       onClick={async () =>
                         this.updateName(await generateName())
                       }
+                      title="Nome aleatório"
                     >
-                      Random
+                      ⟳
                     </Button>
                   }
                 />
-                <InviteButton />
+                <InviteButton className={styles.ncBtn} />
               </div>
               <div style={{ display: "flex", gap: "4px" }}>
                 <Button
-                  color="grey"
+                  variant="unstyled"
+                  className={styles.ncBtn}
+                  style={{ flex: 1, justifyContent: "center" }}
                   onClick={() =>
                     this.setState({
                       showPeopleColumn: !this.state.showPeopleColumn,
                     })
                   }
-                  fullWidth
-                  leftSection={<IconUsersGroup />}
-                  rightSection={
-                    <Badge circle>{this.state.participants.length}</Badge>
-                  }
+                  leftSection={<IconUsersGroup size={13} />}
                 >
-                  People
+                  Users
+                  <span className={styles.chatCount}>
+                    [{this.state.participants.length}]
+                  </span>
                 </Button>
                 <Button
-                  color="grey"
-                  title="Settings"
-                  fullWidth
-                  onClick={() => {
-                    this.setSettingsModalOpen(true);
-                  }}
-                  leftSection={<IconSettings />}
+                  variant="unstyled"
+                  className={styles.ncBtn}
+                  style={{ flex: 1, justifyContent: "center" }}
+                  title="Configurações"
+                  onClick={() => this.setSettingsModalOpen(true)}
+                  leftSection={<IconSettings size={13} />}
                 >
-                  Settings
+                  Config
                 </Button>
               </div>
               {this.state.state === "connected" && (

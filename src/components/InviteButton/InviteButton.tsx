@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { ActionIcon } from "@mantine/core";
 import { InviteModal } from "../Modal/InviteModal";
 import { IconUserPlus } from "@tabler/icons-react";
+import { Button } from "@mantine/core";
 
-export const InviteButton = () => {
+export const InviteButton = ({ className }: { className?: string }) => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
@@ -11,14 +11,14 @@ export const InviteButton = () => {
       {inviteModalOpen && (
         <InviteModal closeInviteModal={() => setInviteModalOpen(false)} />
       )}
-      <ActionIcon
-        size="36px"
-        color="green"
-        title="Invite friends"
+      <Button
+        variant="unstyled"
+        className={className}
+        title="Convidar"
         onClick={() => setInviteModalOpen(true)}
       >
-        <IconUserPlus />
-      </ActionIcon>
+        <IconUserPlus size={13} />
+      </Button>
     </>
   );
 };

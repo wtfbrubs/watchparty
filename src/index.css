@@ -1,8 +1,47 @@
+:root {
+  --nc-bg-primary: #020201;
+  --nc-bg-secondary: #0c0a07;
+  --nc-bg-tertiary: #181410;
+  --nc-bg-card: #110f0c;
+  --nc-border: #2e2a24;
+  --nc-separator: #221e18;
+  --nc-green: #00ff6a;
+  --nc-green-subtle: rgba(0, 255, 106, 0.1);
+  --nc-yellow: #ffea68;
+  --nc-text-primary: #f2eee6;
+  --nc-text-secondary: #b5b0a8;
+  --nc-text-muted: #9c988e;
+  --nc-transition: 0.15s ease;
+  --nc-radius-sm: 3px;
+  --nc-radius-md: 5px;
+  --nc-radius-lg: 8px;
+}
+
 html body {
   margin: 0;
   /* fix for scrollbar popping in and out at certain widths, but adds a permanent scrollbar */
   overflow-y: scroll;
-  background-color: #222222;
+  background-color: var(--nc-bg-primary);
+  color: var(--nc-text-primary);
+  font-family: Inter, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nc-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nc-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nc-text-muted);
 }
 
 ::-webkit-scrollbar-corner {
