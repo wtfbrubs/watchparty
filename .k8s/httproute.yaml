@@ -1,0 +1,47 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: watchparty
+  namespace: watchparty
+spec:
+  parentRefs:
+    - name: watchparty-gateway
+      sectionName: https
+  hostnames:
+    - watch.nativos.cloud
+  rules:
+    # Redireciona HTTP → HTTPS
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: watchparty-https
+  namespace: watchparty
+spec:
+  parentRefs:
+    - name: watchparty-gateway
+      sectionName: https
+  hostnames:
+    - watch.nativos.cloud
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      # Sticky sessions via cookie — obrigatório para socket.io
+      # (suportado em Gateway API v1.1+ via SessionPersistence)
+      sessionPersistence:
+        sessionName: wp-route
+        type: Cookie
+      backendRefs:
+        - name: watchparty-web
+          port: 80

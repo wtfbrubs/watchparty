@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: watchparty-web
+  namespace: watchparty
+spec:
+  selector:
+    app: watchparty-web
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP

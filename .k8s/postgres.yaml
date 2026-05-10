@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: watchparty-postgres
+  namespace: watchparty
+spec:
+  selector:
+    app: watchparty-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+  clusterIP: None  # headless — StatefulSet usa DNS estável por pod
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: watchparty-postgres
+  namespace: watchparty
+spec:
+  serviceName: watchparty-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watchparty-postgres
+  template:
+    metadata:
+      labels:
+        app: watchparty-postgres
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: init-schema
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "watchparty", "-d", "watchparty"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "watchparty", "-d", "watchparty"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+      volumes:
+        - name: init-schema
+          configMap:
+            name: postgres-schema
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: oci-bv
+        resources:
+          requests:
+            storage: 10Gi

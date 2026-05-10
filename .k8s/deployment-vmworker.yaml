@@ -1,0 +1,50 @@
+# Opcional — só necessário se for usar vBrowser (neko containers)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watchparty-vmworker
+  namespace: watchparty
+  labels:
+    app: watchparty-vmworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watchparty-vmworker
+  template:
+    metadata:
+      labels:
+        app: watchparty-vmworker
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: vmworker
+          image: <region>.ocir.io/<namespace>/watchparty:latest
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c", "node server/vmWorker.ts"]
+          ports:
+            - containerPort: 3100
+          envFrom:
+            - configMapRef:
+                name: watchparty-config
+            - secretRef:
+                name: watchparty-secret
+          env:
+            - name: VM_MANAGER_CONFIG
+              value: ""
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /isFreePoolFull
+              port: 3100
+            initialDelaySeconds: 5
+            periodSeconds: 15

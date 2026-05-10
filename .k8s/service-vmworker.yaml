@@ -1,0 +1,13 @@
+# Opcional — só necessário se for usar vBrowser
+apiVersion: v1
+kind: Service
+metadata:
+  name: watchparty-vmworker
+  namespace: watchparty
+spec:
+  selector:
+    app: watchparty-vmworker
+  ports:
+    - port: 3100
+      targetPort: 3100
+  type: ClusterIP

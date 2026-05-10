@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watchparty-cleanup
+  namespace: watchparty
+  labels:
+    app: watchparty-cleanup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watchparty-cleanup
+  template:
+    metadata:
+      labels:
+        app: watchparty-cleanup
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: cleanup
+          image: watchparty
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c", "node server/cleanup.ts"]
+          envFrom:
+            - configMapRef:
+                name: watchparty-config
+            - secretRef:
+                name: watchparty-secret
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"

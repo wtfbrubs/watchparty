@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: watchparty-config
+  namespace: watchparty
+data:
+  NODE_ENV: "production"
+  PORT: "8080"
+  HOST: "0.0.0.0"
+  ROOM_CAPACITY: "0"
+  ROOM_CAPACITY_SUB: "0"
+  FREE_ROOM_LIMIT: "0"
+  SUBSCRIBER_ROOM_LIMIT: "0"
+  VMWORKER_PORT: "3100"
+  VM_ASSIGNMENT_TIMEOUT: "75"

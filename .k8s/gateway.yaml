@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: watchparty-gateway
+  namespace: watchparty
+  annotations:
+    # cert-manager provisiona o certificado automaticamente
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  # Ajuste o gatewayClassName conforme o controller instalado no cluster:
+  #   OCI Native Ingress Controller: "native-ic-gw-class"
+  #   nginx Gateway Fabric:          "nginx"
+  #   Envoy Gateway:                 "eg"
+  gatewayClassName: native-ic-gw-class
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: watch.nativos.cloud
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: watchparty-tls
+      allowedRoutes:
+        namespaces:
+          from: Same

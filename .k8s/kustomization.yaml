@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: watchparty
+
+resources:
+  - namespace.yaml
+  - postgres.yaml
+  - configmap.yaml
+  - deployment-web.yaml
+  - service-web.yaml
+  - deployment-cleanup.yaml
+  - gateway.yaml
+  - httproute.yaml
+  # Descomentar se for usar vBrowser:
+  # - deployment-vmworker.yaml
+  # - service-vmworker.yaml
+
+# Secrets (watchparty-secret, postgres-secret, ocir-secret) são criados
+# pelo workflow do GitHub Actions — não ficam commitados no repo.
+
+images:
+  - name: watchparty
+    newName: OCIR_REGION.ocir.io/OCIR_NAMESPACE/watchparty
+    newTag: latest
+
+configMapGenerator:
+  - name: postgres-schema
+    files:
+      - schema.sql=../sql/schema.sql
