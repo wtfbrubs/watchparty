@@ -1,0 +1,23 @@
+githubConfigUrl: "https://github.com/wtfbrubs/watchparty"
+githubConfigSecret: arc-github-token
+
+minRunners: 0
+maxRunners: 3
+
+containerMode:
+  type: dind  # Docker-in-Docker — necessário para docker buildx dentro do pod
+
+template:
+  spec:
+    nodeSelector:
+      kubernetes.io/arch: arm64
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
