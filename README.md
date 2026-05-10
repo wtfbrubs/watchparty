@@ -1,84 +1,105 @@
-# WatchParty
+# watchparty · nativos.cloud
 
-![screenshot](https://github.com/howardchung/watchparty/raw/master/public/screenshot_full.png)
+Plataforma privada de watch-together para a comunidade nativos.cloud.  
+Fork de [howardchung/watchparty](https://github.com/howardchung/watchparty) com redesign completo e deploy alvo em OKE (Oracle Kubernetes Engine).
 
-A website for watching videos together.
+## Funcionalidades
 
-## Description
+- Sincronização de vídeo em tempo real (play, pause, seek) para todos na sala
+- Compartilhamento de tela (aba, janela ou tela inteira)
+- Virtual Browser compartilhado (powered by [neko](https://github.com/m1k1o/neko))
+- Suporte a YouTube, HTTP, magnet links (WebTorrent) e streams HLS (.m3u8)
+- Playlist com avanço automático ao fim de cada vídeo
+- Chat estilo terminal com reações, replies e menções
+- Video chat (WebRTC)
+- Salas permanentes com vanity URL
 
-- Synchronizes the video being watched with the current room
-- Plays, pauses, and seeks are synced to all watchers
-- Supports:
-  - Screen sharing (full screen, browser tab or application)
-  - Launch a shared virtual browser in the cloud (similar to rabb.it)
-  - Stream-your-own-file
-  - Video files on the Internet (anything accessible via HTTP)
-  - YouTube videos
-  - Magnet links (via WebTorrent)
-  - .m3u8 streams (HLS)
-- Create separate rooms for users on demand
-- Text chat
-- Video chat
+## Início rápido
 
-## Quick Start
+```bash
+# 1. Dependências
+npm install
 
-- Clone this repo via `git clone git@github.com:howardchung/watchparty.git`
-- Install npm dependencies for the project via `npm install`
-- Start the server via `npm run dev`
-  - Defaults to port 8080, customize with `PORT` env var
-  - Set `SSL_KEY_FILE` and `SSL_CRT_FILE` for HTTPS.
-- Start the React application in a separate shell and port via `npm run ui`
-  - Point to server using `VITE_SERVER_HOST` env var if you customized it above
-  - Set `SSL_KEY_FILE` and `SSL_CRT_FILE` for HTTPS.
-  - HTTPS is required by the browser for some WebRTC features (camera, etc.)
-- Duplicate the `.env.example` file
-- Rename it to `.env`
-- Add config for the features you want as described in the advanced setup
+# 2. Configuração
+cp .env.example .env
+# edite o .env com as variáveis necessárias
 
-## Advanced Setup (optional)
+# 3. Dev (dois terminais)
+npm run dev   # backend na porta 8080
+npm run ui    # frontend Vite na porta 5173
+```
 
-All of these are optional and the application should work without them. Some functionality may be missing.
+Acesse `http://localhost:5173`. Com `VITE_FIREBASE_CONFIG` vazio no `.env`, todas as funcionalidades ficam desbloqueadas sem login.
 
-### YouTube API (video search)
+## Configuração
 
-This project uses the YouTube API for video search, which requires an API key. You can get one from Google [here](https://console.developers.google.com).
+### YouTube (busca de vídeos)
 
-Without an API key you won't be able to search for videos via the searchbox.
+Necessário para buscar vídeos pelo nome na barra de endereço.
 
-After creating a **YouTube Data API V3** access, you can create an API key which you can add to your environment variables by copying the `.env.example`, renaming it to `.env` and adding the key to the YOUTUBE_API_KEY variable.
+1. Acesse o [Google Cloud Console](https://console.cloud.google.com)
+2. Ative a **YouTube Data API v3**
+3. Crie uma **API key** em APIs & Services → Credentials
+4. Adicione ao `.env`:
 
-After that restart your server to enable the YouTube API access on your server.
+```
+YOUTUBE_API_KEY=AIza...
+```
 
-### Firebase Config (user authentication)
+A quota gratuita do Google é 10.000 unidades/dia (~100 buscas).
 
-This project uses Firebase for authentication. This is used for user login, account management, subscriptions, and handling some features like room locking/permanence.
+### Firebase (autenticação)
 
-To set up, create a new Firebase app (or reuse an old one) from [here](https://console.firebase.google.com/). After creating an application, click on the settings cog icon in the left menu next to "Project overview" and click on project settings. From there, scroll down, create a web application and copy the Firebase SDK configuration snippet JSON data.
+Necessário para login de usuários, salas permanentes e room locking.
 
-Next, you have to stringify it: `JSON.stringify(PASTE_CONFIG_HERE)` in your browser console, then add it to `VITE_FIREBASE_CONFIG` in your .env file.
+1. Crie um app em [console.firebase.google.com](https://console.firebase.google.com)
+2. Copie o SDK config JSON e stringifique: `JSON.stringify(config)`
+3. Adicione ao `.env`:
 
-For server verification of accounts you'll also need `FIREBASE_ADMIN_SDK_CONFIG`, which you should do the same steps for.
+```
+VITE_FIREBASE_CONFIG={"apiKey":"..."}
+FIREBASE_ADMIN_SDK_CONFIG={"type":"service_account",...}
+```
 
-### Virtual Browser Setup
+### PostgreSQL (persistência de salas)
 
-This project supports creating virtual browsers (using https://github.com/m1k1o/neko) either on a cloud provider or with Docker containers. For development, Docker is easiest.
+```
+DATABASE_URL=postgres://user:pass@host:5432/dbname
+```
 
-- Install Docker: `curl -fsSL https://get.docker.com | sh`
-- Make sure you have an SSH key pair set up on the server (`id_rsa` in `~/.ssh` directory), if not, use `ssh-keygen`.
-- Configure `DOCKER_VM_HOST_SSH_USER` if `root` is not the correct user
-- Note: If your web client is not running on the same physical machine as the server, you will also need to configure `DOCKER_VM_HOST` to a publically-resolvable value (i.e. not localhost)
-- If you want to run managed instance pools (whether on cloud or with Docker), configure `VM_MANAGER_CONFIG` and run the vmWorker service.
+Aplique o schema com `psql $DATABASE_URL < sql/schema.sql`.
 
-### Room Persistence
+### Virtual Browser
 
-- Configure Postgres by adding DATABASE_URL to your .env file and then setting up the database schema
-- This allows rooms to persist between server restarts
+Para desenvolvimento local com Docker:
 
-## Tech
+```bash
+# Instale Docker
+curl -fsSL https://get.docker.com | sh
 
-- React
-- TypeScript
-- Node.js
-- Redis
-- PostgreSQL
-- Docker
+# Inicie um neko de teste
+npm run testvBrowser
+```
+
+Para pools gerenciados em produção, configure `VM_MANAGER_CONFIG` (formato: `provider:size:region:minSize:limitSize:hostname`).
+
+### Redis (métricas — opcional)
+
+```
+REDIS_URL=redis://localhost:6379
+```
+
+## Build e produção
+
+```bash
+npm run build        # compila frontend + typecheck servidor
+npm run pm2          # inicia com PM2 (shards + vmWorker)
+npm run deploy       # pull da branch release + restart PM2
+```
+
+## Stack
+
+- **Frontend**: React 18, TypeScript, Vite 7, Mantine v8
+- **Backend**: Node 24, Express, Socket.IO
+- **Banco**: PostgreSQL (salas), Redis (métricas)
+- **Infra alvo**: OKE / OCI — manifests em `k8s/` (a definir)
