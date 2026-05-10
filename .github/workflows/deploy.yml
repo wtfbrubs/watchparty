@@ -8,8 +8,32 @@ env:
   IMAGE: ${{ secrets.OCIR_REGION }}.ocir.io/${{ secrets.OCIR_NAMESPACE }}/watchparty
 
 jobs:
+  # ── Typecheck + build antecipado para falhar rápido ──────────────────────
+  check:
+    name: Typecheck & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck frontend
+        run: npm run typecheck
+
+      - name: Typecheck server
+        run: npm run typecheckServer
+
+      - name: Build React
+        run: npm run buildReact
+
   # ── Build nativo por arch para evitar emulação QEMU ──────────────────────
   build:
+    needs: check
     name: Build (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     strategy:
