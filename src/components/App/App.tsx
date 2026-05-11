@@ -2156,7 +2156,7 @@ export class App extends React.Component<AppProps, AppState> {
         {
           <div
             className={styles.mobileStack}
-            style={{ margin: "0 8px", display: "flex", columnGap: "32px" }}
+            style={{ margin: "0 8px", display: "flex", columnGap: "8px" }}
           >
             <div
               className={
