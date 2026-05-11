@@ -223,7 +223,7 @@ export const TopBar = (props: {
       <div className={styles.topBar}>
         <a href="/" className={styles.logo}>
           <span className={styles.prompt}>&gt;_</span>
-          nativos<span className={styles.logoDotCloud}>.cloud</span>
+          watchpart<span className={styles.logoDotCloud}>y</span>
         </a>
 
         {props.roomTitle || props.roomDescription ? (
