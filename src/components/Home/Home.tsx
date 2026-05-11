@@ -66,18 +66,15 @@ export const Home = () => {
         </div>
       </div>
 
-      <Hero
+      <Banner
         tag="experiência coletiva"
-        heroText={
+        text={
           <>
-            Reaja aos momentos
-            <br />
-            <em>juntos</em>.
+            Reaja aos momentos <em>juntos</em>.
           </>
         }
-        subText="Encontre momentos de alegria compartilhada mesmo à distância."
+        sub="Encontre momentos de alegria compartilhada mesmo à distância."
         image="/screenshot18.png"
-        reverse
       />
 
       <div className={styles.featuresSection}>
@@ -107,7 +104,7 @@ export const Home = () => {
 
       <div className={styles.stepsSection}>
         <div className={styles.stepsSectionInner}>
-          <div>
+          <div className={styles.sectionHeader}>
             <div className={styles.sectionTitle}>Comece agora.</div>
             <div className={styles.sectionSub}>
               quatro passos, zero burocracia
@@ -175,6 +172,35 @@ const FeatureCard = ({
   );
 };
 
+const Banner = ({
+  tag,
+  text,
+  sub,
+  image,
+}: {
+  tag?: string;
+  text: React.ReactNode;
+  sub?: string;
+  image?: string;
+}) => {
+  return (
+    <div className={styles.banner}>
+      <div className={styles.bannerInner}>
+        <div className={styles.bannerContent}>
+          {tag && <div className={styles.heroTag}>{tag}</div>}
+          <div className={styles.bannerText}>{text}</div>
+          {sub && <div className={styles.bannerSub}>{sub}</div>}
+        </div>
+        {image && (
+          <div className={styles.bannerImage}>
+            <img alt="preview" src={image} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const Hero = ({
   tag,
   heroText,
@@ -208,5 +234,3 @@ export const Hero = ({
     </div>
   );
 };
-
-export const DiscordBot = () => null;

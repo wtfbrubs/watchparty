@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  padding: 0 16px;
-  height: 64px;
+  padding: 0 8px;
+  height: 44px;
   background: var(--nc-bg-secondary);
   border-bottom: 1px solid var(--nc-border);
-  gap: 8px;
+  gap: 6px;
   row-gap: 0;
 }
 
@@ -15,7 +15,7 @@
   align-items: center;
   text-decoration: none;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--nc-text-primary);
   letter-spacing: -0.02em;
@@ -33,31 +33,31 @@
 
 .prompt {
   color: var(--nc-green);
-  margin-right: 6px;
+  margin-right: 5px;
   font-weight: 400;
   opacity: 0.6;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
 }
 
 .roomInfo {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0 8px;
-  padding-left: 12px;
+  margin: 0 6px;
+  padding-left: 10px;
   border-left: 2px solid var(--nc-green);
 }
 
 .roomTitle {
   font-family: "Bebas Neue", sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 1.1;
   letter-spacing: 0.04em;
 }
 
 .roomDescription {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--nc-text-muted);
   margin-top: 1px;
 }
@@ -66,7 +66,10 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 400px;
+  flex-shrink: 0;
 }
 
 /* ── nativos.cloud button variants ───────────────────── */
@@ -81,7 +84,7 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1;
-  padding: 0.42rem 1rem;
+  padding: 0.32rem 0.85rem;
   border-radius: 3px;
   border: 1px solid var(--nc-yellow);
   background: transparent;
@@ -112,7 +115,7 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1;
-  padding: 0.42rem 0.9rem;
+  padding: 0.32rem 0.75rem;
   border-radius: 3px;
   border: 1px solid var(--nc-border);
   background: transparent;
@@ -136,8 +139,8 @@
 @media only screen and (max-width: 600px) {
   .topBar {
     height: auto;
-    padding: 8px 12px;
-    row-gap: 8px;
+    padding: 6px 12px;
+    row-gap: 6px;
   }
 
   .actions {

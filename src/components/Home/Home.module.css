@@ -1,7 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 44px);
 }
 
 /* ── Hero ─────────────────────────────────────────────── */
@@ -10,8 +10,8 @@
   width: 100%;
   padding: 5rem 5%;
   background-color: var(--nc-bg-primary);
-  background-image: radial-gradient(circle, var(--nc-border) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image:
+    radial-gradient(ellipse 70% 80% at 75% 50%, rgba(0, 255, 106, 0.055) 0%, transparent 70%);
   border-bottom: 1px solid var(--nc-border);
   box-sizing: border-box;
 }
@@ -92,6 +92,66 @@
   display: block;
 }
 
+/* ── Banner (segundo hero — mais compacto) ────────────── */
+
+.banner {
+  width: 100%;
+  padding: 3rem 5%;
+  background-color: var(--nc-bg-secondary);
+  background-image:
+    radial-gradient(ellipse 60% 100% at 25% 50%, rgba(0, 255, 106, 0.04) 0%, transparent 70%);
+  border-bottom: 1px solid var(--nc-border);
+  box-sizing: border-box;
+}
+
+.bannerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.bannerContent {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.bannerText {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--nc-text-primary);
+  margin: 0 0 0.6rem 0;
+}
+
+.bannerText em {
+  font-style: normal;
+  color: var(--nc-green);
+}
+
+.bannerSub {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  color: var(--nc-text-muted);
+  line-height: 1.6;
+}
+
+.bannerImage {
+  flex: 0 0 auto;
+  width: 45%;
+  max-width: 520px;
+}
+
+.bannerImage img {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid var(--nc-border);
+  display: block;
+}
+
 /* ── Features ─────────────────────────────────────────── */
 
 .featuresSection {
@@ -112,16 +172,18 @@
 .featureCard {
   background: var(--nc-bg-card);
   border: 1px solid var(--nc-border);
+  border-left: 2px solid transparent;
   border-radius: 5px;
   padding: 1.4rem 1.2rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  transition: border-color var(--nc-transition);
+  transition: border-color var(--nc-transition), border-left-color var(--nc-transition);
 }
 
 .featureCard:hover {
-  border-color: var(--nc-green);
+  border-color: var(--nc-border);
+  border-left-color: var(--nc-green);
 }
 
 .featureIcon {
@@ -164,22 +226,26 @@
   gap: 2.5rem;
 }
 
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
 .sectionTitle {
   font-family: "Bebas Neue", sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 400;
   line-height: 1.0;
   color: var(--nc-text-primary);
-  margin: 0 0 0.3rem 0;
-  text-align: center;
+  margin: 0;
 }
 
 .sectionSub {
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.78rem;
   color: var(--nc-text-muted);
-  text-align: center;
-  margin-bottom: 2rem;
+  margin: 0;
 }
 
 .stepsList {
@@ -230,7 +296,6 @@
 
 .stepsAction {
   display: flex;
-  justify-content: center;
 }
 
 /* ── Responsive ───────────────────────────────────────── */
@@ -245,11 +310,25 @@
   .heroImage {
     width: 100%;
   }
+
+  .bannerInner {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .bannerImage {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 @media only screen and (max-width: 600px) {
   .hero {
     padding: 3rem 5%;
+  }
+
+  .banner {
+    padding: 2rem 5%;
   }
 
   .featuresSection,
