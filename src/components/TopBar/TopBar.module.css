@@ -31,12 +31,12 @@
   color: var(--nc-green);
 }
 
-.prompt {
+.logoIcon {
   color: var(--nc-green);
   margin-right: 5px;
-  font-weight: 400;
-  opacity: 0.6;
-  font-size: 0.72rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .roomInfo {

@@ -11,6 +11,7 @@ import {
   IconCirclePlusFilled,
   IconDatabase,
   IconLogin,
+  IconPlayerPlayFilled,
   IconTrash,
 } from "@tabler/icons-react";
 import styles from "./TopBar.module.css";
@@ -222,7 +223,7 @@ export const TopBar = (props: {
     <React.Fragment>
       <div className={styles.topBar}>
         <a href="/" className={styles.logo}>
-          <span className={styles.prompt}>&gt;_</span>
+          <IconPlayerPlayFilled size={14} className={styles.logoIcon} />
           watchpart<span className={styles.logoDotCloud}>y</span>
         </a>
 
