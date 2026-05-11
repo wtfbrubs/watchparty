@@ -1,10 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- nativos.cloud · watchparty favicon — music note on dark terminal bg -->
-  <rect width="32" height="32" rx="5" fill="#0D0D0D"/>
-  <!-- note head: tilted ellipse -->
-  <ellipse cx="11.5" cy="22.5" rx="5.5" ry="3.8" fill="#00FF6A" transform="rotate(-18 11.5 22.5)"/>
-  <!-- stem -->
-  <rect x="16.2" y="6.5" width="2.4" height="17" fill="#00FF6A" rx="1.2"/>
-  <!-- flag: curves right from top of stem -->
-  <path d="M18.6 6.5 C26 9.5 25.5 18 19 20" stroke="#00FF6A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="32" height="32" rx="6" fill="#0D0D0D"/>
+  <ellipse cx="11.5" cy="23.5" rx="6.5" ry="4.5" fill="#00FF6A" transform="rotate(-18 11.5 23.5)"/>
+  <rect x="17" y="5.5" width="3" height="19" fill="#00FF6A" rx="1.5"/>
+  <path d="M17 5.5 Q25 7.5 25 15 Q25 18 21 19" stroke="#00FF6A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
