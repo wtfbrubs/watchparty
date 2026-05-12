@@ -1,50 +1,52 @@
-name: Setup ARC
+# DISABLED
 
-on:
-  workflow_dispatch:
+# name: Setup ARC
 
-jobs:
-  setup:
-    name: Install Actions Runner Controller
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+# on:
+#   workflow_dispatch:
 
-      - uses: azure/setup-helm@v4
+# jobs:
+#   setup:
+#     name: Install Actions Runner Controller
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Setup kubectl
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+#       - uses: azure/setup-helm@v4
 
-      - name: Create namespaces
-        run: |
-          kubectl create namespace arc-systems --dry-run=client -o yaml | kubectl apply -f -
-          kubectl create namespace arc-runners --dry-run=client -o yaml | kubectl apply -f -
+#       - name: Setup kubectl
+#         run: |
+#           mkdir -p $HOME/.kube
+#           echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
+#           chmod 600 $HOME/.kube/config
 
-      - name: Create GitHub token secret
-        run: |
-          kubectl create secret generic arc-github-token \
-            --from-literal=github_token="${{ secrets.ARC_GITHUB_TOKEN }}" \
-            -n arc-runners \
-            --dry-run=client -o yaml | kubectl apply -f -
+#       - name: Create namespaces
+#         run: |
+#           kubectl create namespace arc-systems --dry-run=client -o yaml | kubectl apply -f -
+#           kubectl create namespace arc-runners --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Install ARC controller
-        run: |
-          helm upgrade --install arc \
-            oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
-            --namespace arc-systems \
-            -f .k8s/arc/controller-values.yaml \
-            --wait
+#       - name: Create GitHub token secret
+#         run: |
+#           kubectl create secret generic arc-github-token \
+#             --from-literal=github_token="${{ secrets.ARC_GITHUB_TOKEN }}" \
+#             -n arc-runners \
+#             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Install runner scale set
-        run: |
-          helm upgrade --install watchparty-runner \
-            oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
-            --namespace arc-runners \
-            -f .k8s/arc/runner-values.yaml \
-            --wait
+#       - name: Install ARC controller
+#         run: |
+#           helm upgrade --install arc \
+#             oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+#             --namespace arc-systems \
+#             -f .k8s/arc/controller-values.yaml \
+#             --wait
 
-      - name: Verify runners
-        run: kubectl get pods -n arc-runners
+#       - name: Install runner scale set
+#         run: |
+#           helm upgrade --install watchparty-runner \
+#             oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+#             --namespace arc-runners \
+#             -f .k8s/arc/runner-values.yaml \
+#             --wait
+
+#       - name: Verify runners
+#         run: kubectl get pods -n arc-runners

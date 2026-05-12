@@ -1,177 +1,179 @@
-name: Build & Deploy
+# DISABLED
 
-on:
-  push:
-    branches: [master]
+# name: Build & Deploy
 
-env:
-  IMAGE: ${{ secrets.OCIR_REGION }}.ocir.io/${{ secrets.OCIR_NAMESPACE }}/watchparty
+# on:
+#   push:
+#     branches: [master]
 
-jobs:
-  # ── Typecheck + build antecipado para falhar rápido ──────────────────────
-  check:
-    name: Typecheck & Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+# env:
+#   IMAGE: ${{ secrets.OCIR_REGION }}.ocir.io/${{ secrets.OCIR_NAMESPACE }}/watchparty
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
+# jobs:
+#   # ── Typecheck + build antecipado para falhar rápido ──────────────────────
+#   check:
+#     name: Typecheck & Build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - run: npm ci
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 24
+#           cache: npm
 
-      - name: Typecheck frontend
-        run: npm run typecheck
+#       - run: npm ci
 
-      - name: Typecheck server
-        run: npm run typecheckServer
+#       - name: Typecheck frontend
+#         run: npm run typecheck
 
-      - name: Build React
-        run: npm run buildReact
+#       - name: Typecheck server
+#         run: npm run typecheckServer
 
-  # ── Build nativo por arch para evitar emulação QEMU ──────────────────────
-  build:
-    needs: check
-    name: Build (${{ matrix.platform }})
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            runner: ubuntu-latest
-          - platform: linux/arm64
-            runner: watchparty-runner
-    steps:
-      - uses: actions/checkout@v4
+#       - name: Build React
+#         run: npm run buildReact
 
-      - name: Login to OCIR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.OCIR_REGION }}.ocir.io
-          username: ${{ secrets.OCIR_USERNAME }}
-          password: ${{ secrets.OCIR_TOKEN }}
+#   # ── Build nativo por arch para evitar emulação QEMU ──────────────────────
+#   build:
+#     needs: check
+#     name: Build (${{ matrix.platform }})
+#     runs-on: ${{ matrix.runner }}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         include:
+#           - platform: linux/amd64
+#             runner: ubuntu-latest
+#           - platform: linux/arm64
+#             runner: watchparty-runner
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
+#       - name: Login to OCIR
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ${{ secrets.OCIR_REGION }}.ocir.io
+#           username: ${{ secrets.OCIR_USERNAME }}
+#           password: ${{ secrets.OCIR_TOKEN }}
 
-      - name: Build and push digest
-        id: build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: ${{ matrix.platform }}
-          push: true
-          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+#       - uses: docker/setup-buildx-action@v3
 
-      - name: Export digest
-        run: |
-          mkdir -p /tmp/digests
-          touch "/tmp/digests/${DIGEST#sha256:}"
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
+#       - name: Build and push digest
+#         id: build
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: .
+#           platforms: ${{ matrix.platform }}
+#           push: true
+#           outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: digest-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
-          path: /tmp/digests/*
-          retention-days: 1
+#       - name: Export digest
+#         run: |
+#           mkdir -p /tmp/digests
+#           touch "/tmp/digests/${DIGEST#sha256:}"
+#         env:
+#           DIGEST: ${{ steps.build.outputs.digest }}
 
-  # ── Combina os dois digests em um manifesto multi-arch ───────────────────
-  merge:
-    name: Merge manifest
-    needs: build
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag.outputs.value }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: /tmp/digests
-          merge-multiple: true
+#       - uses: actions/upload-artifact@v4
+#         with:
+#           name: digest-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+#           path: /tmp/digests/*
+#           retention-days: 1
 
-      - name: Login to OCIR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.OCIR_REGION }}.ocir.io
-          username: ${{ secrets.OCIR_USERNAME }}
-          password: ${{ secrets.OCIR_TOKEN }}
+#   # ── Combina os dois digests em um manifesto multi-arch ───────────────────
+#   merge:
+#     name: Merge manifest
+#     needs: build
+#     runs-on: ubuntu-latest
+#     outputs:
+#       tag: ${{ steps.tag.outputs.value }}
+#     steps:
+#       - uses: actions/download-artifact@v4
+#         with:
+#           path: /tmp/digests
+#           merge-multiple: true
 
-      - uses: docker/setup-buildx-action@v3
+#       - name: Login to OCIR
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ${{ secrets.OCIR_REGION }}.ocir.io
+#           username: ${{ secrets.OCIR_USERNAME }}
+#           password: ${{ secrets.OCIR_TOKEN }}
 
-      - name: Compute tag
-        id: tag
-        run: echo "value=sha-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+#       - uses: docker/setup-buildx-action@v3
 
-      - name: Create and push manifest
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create \
-            -t ${{ env.IMAGE }}:${{ steps.tag.outputs.value }} \
-            -t ${{ env.IMAGE }}:latest \
-            $(printf '${{ env.IMAGE }}@sha256:%s ' *)
+#       - name: Compute tag
+#         id: tag
+#         run: echo "value=sha-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
 
-  # ── Deploy no OKE ─────────────────────────────────────────────────────────
-  deploy:
-    name: Deploy to OKE
-    needs: merge
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#       - name: Create and push manifest
+#         working-directory: /tmp/digests
+#         run: |
+#           docker buildx imagetools create \
+#             -t ${{ env.IMAGE }}:${{ steps.tag.outputs.value }} \
+#             -t ${{ env.IMAGE }}:latest \
+#             $(printf '${{ env.IMAGE }}@sha256:%s ' *)
 
-      - name: Setup kubectl
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+#   # ── Deploy no OKE ─────────────────────────────────────────────────────────
+#   deploy:
+#     name: Deploy to OKE
+#     needs: merge
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Ensure namespace
-        run: kubectl apply -f .k8s/namespace.yaml
+#       - name: Setup kubectl
+#         run: |
+#           mkdir -p $HOME/.kube
+#           echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
+#           chmod 600 $HOME/.kube/config
 
-      - name: OCIR pull secret
-        run: |
-          kubectl create secret docker-registry ocir-secret \
-            --docker-server=${{ secrets.OCIR_REGION }}.ocir.io \
-            --docker-username="${{ secrets.OCIR_USERNAME }}" \
-            --docker-password="${{ secrets.OCIR_TOKEN }}" \
-            -n watchparty \
-            --dry-run=client -o yaml | kubectl apply -f -
+#       - name: Ensure namespace
+#         run: kubectl apply -f .k8s/namespace.yaml
 
-      - name: App secret
-        run: |
-          kubectl create secret generic watchparty-secret \
-            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
-            --from-literal=STATS_KEY="${{ secrets.STATS_KEY }}" \
-            --from-literal=FIREBASE_ADMIN_SDK_CONFIG="${{ secrets.FIREBASE_ADMIN_SDK_CONFIG }}" \
-            --from-literal=STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" \
-            --from-literal=YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
-            --from-literal=DISCORD_BOT_TOKEN="${{ secrets.DISCORD_BOT_TOKEN }}" \
-            -n watchparty \
-            --dry-run=client -o yaml | kubectl apply -f -
+#       - name: OCIR pull secret
+#         run: |
+#           kubectl create secret docker-registry ocir-secret \
+#             --docker-server=${{ secrets.OCIR_REGION }}.ocir.io \
+#             --docker-username="${{ secrets.OCIR_USERNAME }}" \
+#             --docker-password="${{ secrets.OCIR_TOKEN }}" \
+#             -n watchparty \
+#             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Postgres secret
-        run: |
-          kubectl create secret generic postgres-secret \
-            --from-literal=POSTGRES_USER="${{ secrets.POSTGRES_USER }}" \
-            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
-            --from-literal=POSTGRES_DB="${{ secrets.POSTGRES_DB }}" \
-            -n watchparty \
-            --dry-run=client -o yaml | kubectl apply -f -
+#       - name: App secret
+#         run: |
+#           kubectl create secret generic watchparty-secret \
+#             --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+#             --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
+#             --from-literal=STATS_KEY="${{ secrets.STATS_KEY }}" \
+#             --from-literal=FIREBASE_ADMIN_SDK_CONFIG="${{ secrets.FIREBASE_ADMIN_SDK_CONFIG }}" \
+#             --from-literal=STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" \
+#             --from-literal=YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" \
+#             --from-literal=DISCORD_BOT_TOKEN="${{ secrets.DISCORD_BOT_TOKEN }}" \
+#             -n watchparty \
+#             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Set image
-        run: |
-          cd .k8s
-          kustomize edit set image \
-            watchparty=${{ secrets.OCIR_REGION }}.ocir.io/${{ secrets.OCIR_NAMESPACE }}/watchparty:${{ needs.merge.outputs.tag }}
+#       - name: Postgres secret
+#         run: |
+#           kubectl create secret generic postgres-secret \
+#             --from-literal=POSTGRES_USER="${{ secrets.POSTGRES_USER }}" \
+#             --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+#             --from-literal=POSTGRES_DB="${{ secrets.POSTGRES_DB }}" \
+#             -n watchparty \
+#             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Apply
-        run: kubectl apply -k .k8s/
+#       - name: Set image
+#         run: |
+#           cd .k8s
+#           kustomize edit set image \
+#             watchparty=${{ secrets.OCIR_REGION }}.ocir.io/${{ secrets.OCIR_NAMESPACE }}/watchparty:${{ needs.merge.outputs.tag }}
 
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/watchparty-web -n watchparty --timeout=300s
-          kubectl rollout status deployment/watchparty-cleanup -n watchparty --timeout=120s
+#       - name: Apply
+#         run: kubectl apply -k .k8s/
+
+#       - name: Wait for rollout
+#         run: |
+#           kubectl rollout status deployment/watchparty-web -n watchparty --timeout=300s
+#           kubectl rollout status deployment/watchparty-cleanup -n watchparty --timeout=120s
